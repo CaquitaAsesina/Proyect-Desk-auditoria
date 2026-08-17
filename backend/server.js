@@ -315,7 +315,7 @@ app.delete('/api/areas/:id', requiereAdmin, manejar(async (req, res) => {
 
 /* =========================================================
    PRODUCTOS
-   - El código es obligatorio y único.
+   - El código es obligatorio y único dentro de cada área (áreas distintas pueden repetirlo).
    - La cantidad NO se edita aquí: solo la registra una auditoría.
    [Solo administrador para escribir]
    ========================================================= */
@@ -337,7 +337,7 @@ app.post('/api/productos', requiereAdmin, manejar(async (req, res) => {
         );
     } catch (err) {
         if (esCodigoDuplicado(err)) {
-            return res.status(400).json({ error: `Ya existe un producto con el código «${codigo}».` });
+            return res.status(400).json({ error: `Ya existe un producto con el código «${codigo}» en esta área.` });
         }
         throw err;
     }
@@ -359,7 +359,7 @@ app.put('/api/productos/:id', requiereAdmin, manejar(async (req, res) => {
         if (resultado.affectedRows === 0) return res.status(404).json({ error: 'Producto no encontrado.' });
     } catch (err) {
         if (esCodigoDuplicado(err)) {
-            return res.status(400).json({ error: `Ya existe un producto con el código «${codigo}».` });
+            return res.status(400).json({ error: `Ya existe un producto con el código «${codigo}» en esta área.` });
         }
         throw err;
     }

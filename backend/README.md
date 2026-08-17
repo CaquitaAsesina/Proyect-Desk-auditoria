@@ -212,7 +212,7 @@ Ajusta `DB_USER` y `DB_PASSWORD` en `.env.local` con ese usuario, y luego corre 
 
 Tablas: `areas`, `productos`, `auditorias`, `detalle_auditoria`, `usuarios`.
 
-- `productos.codigo` es obligatorio y único.
+- `productos.codigo` es obligatorio y único dentro de cada área (áreas distintas pueden usar el mismo código).
 - `productos.cantidad_actual` solo se modifica al registrar una auditoría.
 - `productos.area_id` → FK a `areas` con `ON DELETE CASCADE`.
 - `auditorias.area_id` → FK a `areas` con `ON DELETE SET NULL` (las auditorías son snapshots históricos y se conservan aunque se elimine el área).

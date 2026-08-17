@@ -54,7 +54,7 @@ const ESQUEMA = [
         unidad VARCHAR(30) NOT NULL DEFAULT 'unidades',
         cantidad_actual INT NOT NULL DEFAULT 0,
         fecha_actualizacion DATETIME,
-        UNIQUE KEY uq_productos_codigo (codigo),
+        UNIQUE KEY uq_productos_area_codigo (area_id, codigo),
         CONSTRAINT fk_productos_area FOREIGN KEY (area_id)
             REFERENCES areas (id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
