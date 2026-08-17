@@ -36,7 +36,7 @@ services:
       - key: DB_SSL
         value: "true"
       - key: ADMIN_USUARIO
-        value: FP70270486
+        value: FP76270486
       - key: ADMIN_NOMBRE
         value: Administrador
       - key: LECTURA_USUARIO

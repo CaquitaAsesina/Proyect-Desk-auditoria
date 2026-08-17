@@ -141,10 +141,9 @@ const Auditorias = {
                     </div>
                 </td>
                 <td class="text-center d-none d-sm-table-cell text-muted">${Utiles.escapeHtml(p.unidad || 'unidades')}</td>
-                <td class="text-center"><span class="badge text-bg-light border">${Utiles.formatearNumero(p.cantidadActual)}</span></td>
                 <td class="text-center">
                     <input type="number" class="form-control form-control-sm input-cantidad mx-auto" min="0" step="1"
-                           data-producto-id="${p.id}" value="${p.cantidadActual}" aria-label="Cantidad encontrada de ${Utiles.escapeHtml(p.nombre)}">
+                           data-producto-id="${p.id}" value="" placeholder="0" aria-label="Cantidad encontrada de ${Utiles.escapeHtml(p.nombre)}">
                 </td>
             </tr>`).join('');
     },
@@ -179,8 +178,8 @@ const Auditorias = {
 
         const cantidades = {};
         for (const input of inputs) {
-            const valor = Number(input.value);
-            if (input.value === '' || Number.isNaN(valor) || valor < 0) {
+            const valor = input.value === '' ? 0 : Number(input.value);
+            if (Number.isNaN(valor) || valor < 0) {
                 input.classList.add('is-invalid');
                 App.mostrarToast('Revisa las cantidades encontradas: deben ser números iguales o mayores a cero.', 'danger');
                 input.focus();
@@ -276,8 +275,6 @@ const Auditorias = {
         document.getElementById('tituloDetalleAuditoria').innerHTML =
             `<i class="bi bi-clipboard2-check me-2 text-primary"></i>AUDITORÍA #${this.numeroDeAuditoria(a.id)}`;
 
-        const totalUnidades = a.detalles.reduce((s, d) => s + Number(d.cantidadAuditada || 0), 0);
-
         document.getElementById('cuerpoDetalleAuditoria').innerHTML = `
             <div class="detalle-auditoria">
                 <div class="detalle-header">
@@ -291,7 +288,7 @@ const Auditorias = {
                 </div>
                 <table class="table table-sm align-middle">
                     <thead>
-                        <tr><th>Producto</th><th class="text-center">Cantidad anterior</th><th class="text-center">Cantidad encontrada</th><th class="text-center">Diferencia</th></tr>
+                        <tr><th>Producto</th><th class="text-center">Cantidad anterior</th><th class="text-center">Cantidad encontrada</th></tr>
                     </thead>
                     <tbody>
                         ${a.detalles.map(d => `
@@ -299,15 +296,8 @@ const Auditorias = {
                                 <td>${Utiles.escapeHtml(d.productoNombre)}</td>
                                 <td class="text-center">${Utiles.formatearNumero(d.cantidadAnterior)}</td>
                                 <td class="text-center fw-bold">${Utiles.formatearNumero(d.cantidadAuditada)}</td>
-                                <td class="text-center">${this.badgeDiferencia(d.diferencia)}</td>
                             </tr>`).join('')}
                     </tbody>
-                    <tfoot>
-                        <tr class="table-light fw-bold">
-                            <td>TOTAL</td><td class="text-center">${Utiles.formatearNumero(a.detalles.reduce((s, d) => s + Number(d.cantidadAnterior || 0), 0))}</td>
-                            <td class="text-center">${Utiles.formatearNumero(totalUnidades)}</td><td></td>
-                        </tr>
-                    </tfoot>
                 </table>
             </div>`;
 
@@ -432,23 +422,20 @@ const Auditorias = {
     imprimirAuditoria(id) {
         const a = this.obtenerAuditoria(id);
         if (!a) return;
-        const total = a.detalles.reduce((s, d) => s + Number(d.cantidadAuditada || 0), 0);
 
         const filas = a.detalles.map(d => `
             <tr>
                 <td>${Utiles.escapeHtml(d.productoNombre)}</td>
                 <td class="text-center">${Utiles.formatearNumero(d.cantidadAnterior)}</td>
                 <td class="text-center">${Utiles.formatearNumero(d.cantidadAuditada)}</td>
-                <td class="text-center">${d.diferencia > 0 ? '+' : ''}${d.diferencia}</td>
             </tr>`).join('');
 
         const cuerpo = `
             <p><strong>Área:</strong> ${Utiles.escapeHtml(a.areaNombre)} &nbsp;|&nbsp; <strong>Fecha:</strong> ${Utiles.formatearFecha(a.fecha)} &nbsp;|&nbsp; <strong>Hora:</strong> ${Utiles.escapeHtml(a.hora)}</p>
             <p><strong>Responsable:</strong> ${Utiles.escapeHtml(a.responsable || 'No indicado')} &nbsp;|&nbsp; <strong>Observación:</strong> ${Utiles.escapeHtml(a.observacion || '—')}</p>
             <table class="tabla-reporte">
-                <thead><tr><th>Producto</th><th>Anterior</th><th>Encontrado</th><th>Diferencia</th></tr></thead>
+                <thead><tr><th>Producto</th><th>Anterior</th><th>Encontrado</th></tr></thead>
                 <tbody>${filas}</tbody>
-                <tfoot><tr><th>TOTAL</th><th></th><th>${Utiles.formatearNumero(total)}</th><th></th></tr></tfoot>
             </table>`;
 
         App.imprimirReporte(`Auditoría #${this.numeroDeAuditoria(a.id)} — ${a.areaNombre}`, cuerpo);

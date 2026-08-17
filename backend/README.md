@@ -163,7 +163,7 @@ LECTURA_CONTRASENA=lectura123
 
 #### 3. Usar la app desplegada
 
-- Cualquier PC del mundo entra a `https://auditoria-app.onrender.com` con los mismos usuarios (`FP70270486` admin, `lectura` consulta).
+- Cualquier PC del mundo entra a `https://auditoria-app.onrender.com` con los mismos usuarios (`FP76270486` admin, `lectura` consulta).
 - Los datos son los mismos de Aiven; todo lo que cambies en la web queda guardado en la nube.
 
 > **Plan gratis:** Render apaga el servicio tras ~15 minutos sin uso; la primera visita después del apagado tarda ~50 segundos en responder (arranque en frío). Para evitar esto se usa el plan pagado (~7 USD/mes) o un servicio alterno como **Railway** o **Fly.io**.
