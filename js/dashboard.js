@@ -136,32 +136,47 @@ const Dashboard = {
         }
     },
 
-    /** Muestra los productos de cada área con su cantidad (en vez de totales). */
-    renderInventarioPorArea(areaIdFiltro) {
+    graficoInventarioPorArea(areaIdFiltro) {
         const datos = StorageManager.obtenerDatos();
         const areas = areaIdFiltro ? datos.areas.filter(a => a.id === areaIdFiltro) : datos.areas;
-        const productos = datos.productos.filter(p => areas.some(a => a.id === p.areaId));
 
-        const tbody = document.getElementById('tablaInventarioAreaDashboard');
-        const vacio = document.getElementById('vacioG1');
-        if (!tbody) return;
-
-        if (productos.length === 0) {
-            tbody.innerHTML = '';
-            if (vacio) vacio.classList.remove('d-none');
+        if (areas.length === 0) {
+            this.mostrarVacio('vacioG1', true);
             return;
         }
-        if (vacio) vacio.classList.add('d-none');
+        this.mostrarVacio('vacioG1', false);
 
-        const nombreArea = {};
-        areas.forEach(a => { nombreArea[a.id] = a.nombre; });
+        const etiquetas = areas.map(a => a.nombre);
+        const valores = areas.map(a => datos.productos
+            .filter(p => p.areaId === a.id)
+            .reduce((s, p) => s + Number(p.cantidadActual || 0), 0));
 
-        tbody.innerHTML = productos.map(p => `
-            <tr>
-                <td><span class="badge bg-primary-subtle text-primary">${Utiles.escapeHtml(nombreArea[p.areaId] || '—')}</span></td>
-                <td class="fw-semibold">${Utiles.escapeHtml(p.nombre)}</td>
-                <td class="text-center"><span class="badge text-bg-light border">${Utiles.formatearNumero(p.cantidadActual)}</span></td>
-            </tr>`).join('');
+        this.crearGrafico('g1', 'graficoInventarioArea', {
+            type: 'bar',
+            data: {
+                labels: etiquetas,
+                datasets: [{
+                    label: 'Unidades existentes',
+                    data: valores,
+                    backgroundColor: this.PALETA.map(c => c + 'cc'),
+                    borderColor: this.PALETA,
+                    borderWidth: 1,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} unidades` } }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#eef2f8' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
     },
 
     graficoAuditoriasPorDia(areaIdFiltro, rango) {
@@ -333,7 +348,7 @@ const Dashboard = {
 
     renderGraficos(estadisticas) {
         const e = estadisticas;
-        this.renderInventarioPorArea(this.estado.areaId);
+        this.graficoInventarioPorArea(this.estado.areaId);
         this.graficoAuditoriasPorDia(this.estado.areaId, e.rango);
         this.graficoProductosPorArea(this.estado.areaId);
         this.renderGraficoEvolucion();

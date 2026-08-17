@@ -265,18 +265,11 @@
                     <div class="col-lg-6">
                         <div class="card shadow-sm h-100">
                             <div class="card-header d-flex align-items-center gap-2">
-                                <i class="bi bi-boxes text-primary"></i><span class="fw-semibold">Inventario por área</span>
+                                <i class="bi bi-bar-chart-fill text-primary"></i><span class="fw-semibold">Inventario por área</span>
                             </div>
                             <div class="card-body chart-box">
                                 <div class="chart-empty d-none" id="vacioG1"><i class="bi bi-inbox"></i><p>Sin datos para mostrar</p></div>
-                                <div class="table-responsive">
-                                    <table class="table table-sm align-middle mb-0">
-                                        <thead>
-                                            <tr><th>Área</th><th>Producto</th><th class="text-center">Cantidad</th></tr>
-                                        </thead>
-                                        <tbody id="tablaInventarioAreaDashboard"></tbody>
-                                    </table>
-                                </div>
+                                <canvas id="graficoInventarioArea" height="260"></canvas>
                             </div>
                         </div>
                     </div>

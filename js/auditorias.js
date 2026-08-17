@@ -288,13 +288,12 @@ const Auditorias = {
                 </div>
                 <table class="table table-sm align-middle">
                     <thead>
-                        <tr><th>Producto</th><th class="text-center">Cantidad anterior</th><th class="text-center">Cantidad encontrada</th></tr>
+                        <tr><th>Producto</th><th class="text-center">Cantidad encontrada</th></tr>
                     </thead>
                     <tbody>
                         ${a.detalles.map(d => `
                             <tr>
                                 <td>${Utiles.escapeHtml(d.productoNombre)}</td>
-                                <td class="text-center">${Utiles.formatearNumero(d.cantidadAnterior)}</td>
                                 <td class="text-center fw-bold">${Utiles.formatearNumero(d.cantidadAuditada)}</td>
                             </tr>`).join('')}
                     </tbody>
@@ -426,7 +425,6 @@ const Auditorias = {
         const filas = a.detalles.map(d => `
             <tr>
                 <td>${Utiles.escapeHtml(d.productoNombre)}</td>
-                <td class="text-center">${Utiles.formatearNumero(d.cantidadAnterior)}</td>
                 <td class="text-center">${Utiles.formatearNumero(d.cantidadAuditada)}</td>
             </tr>`).join('');
 
@@ -434,7 +432,7 @@ const Auditorias = {
             <p><strong>Área:</strong> ${Utiles.escapeHtml(a.areaNombre)} &nbsp;|&nbsp; <strong>Fecha:</strong> ${Utiles.formatearFecha(a.fecha)} &nbsp;|&nbsp; <strong>Hora:</strong> ${Utiles.escapeHtml(a.hora)}</p>
             <p><strong>Responsable:</strong> ${Utiles.escapeHtml(a.responsable || 'No indicado')} &nbsp;|&nbsp; <strong>Observación:</strong> ${Utiles.escapeHtml(a.observacion || '—')}</p>
             <table class="tabla-reporte">
-                <thead><tr><th>Producto</th><th>Anterior</th><th>Encontrado</th></tr></thead>
+                <thead><tr><th>Producto</th><th>Encontrado</th></tr></thead>
                 <tbody>${filas}</tbody>
             </table>`;
 
