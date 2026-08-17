@@ -77,9 +77,7 @@ const ESQUEMA = [
         auditoria_id VARCHAR(40) NOT NULL,
         producto_id VARCHAR(40),
         producto_nombre VARCHAR(100) NOT NULL,
-        cantidad_anterior INT NOT NULL DEFAULT 0,
         cantidad_auditada INT NOT NULL DEFAULT 0,
-        diferencia INT NOT NULL DEFAULT 0,
         CONSTRAINT fk_detalle_auditoria FOREIGN KEY (auditoria_id)
             REFERENCES auditorias (id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,

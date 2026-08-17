@@ -71,14 +71,11 @@ const Auditorias = {
         const horaConSegundos = hora.length === 5 ? `${hora}:${segundos}` : hora;
 
         const detalles = productos.map(p => {
-            const anterior = Number(p.cantidadActual) || 0;
             const auditada = Math.max(0, Number(cantidades[p.id]) || 0);
             return {
                 productoId: p.id,
                 productoNombre: p.nombre,
-                cantidadAnterior: anterior,
-                cantidadAuditada: auditada,
-                diferencia: auditada - anterior
+                cantidadAuditada: auditada
             };
         });
 

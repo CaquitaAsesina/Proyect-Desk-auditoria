@@ -211,9 +211,7 @@ app.get('/api/datos', manejar(async (req, res) => {
         detallesPorAuditoria[d.auditoria_id].push({
             productoId: d.producto_id,
             productoNombre: d.producto_nombre,
-            cantidadAnterior: d.cantidad_anterior,
-            cantidadAuditada: d.cantidad_auditada,
-            diferencia: d.diferencia
+            cantidadAuditada: d.cantidad_auditada
         });
     });
 
@@ -262,8 +260,8 @@ app.post('/api/datos', requiereAdmin, manejar(async (req, res) => {
             );
             for (const d of aud.detalles || []) {
                 await conn.query(
-                    'INSERT INTO detalle_auditoria (auditoria_id, producto_id, producto_nombre, cantidad_anterior, cantidad_auditada, diferencia) VALUES (?, ?, ?, ?, ?, ?)',
-                    [aud.id, d.productoId || null, d.productoNombre, Number(d.cantidadAnterior) || 0, Number(d.cantidadAuditada) || 0, Number(d.diferencia) || 0]
+                    'INSERT INTO detalle_auditoria (auditoria_id, producto_id, producto_nombre, cantidad_auditada) VALUES (?, ?, ?, ?)',
+                    [aud.id, d.productoId || null, d.productoNombre, Number(d.cantidadAuditada) || 0]
                 );
             }
         }
@@ -397,8 +395,8 @@ app.post('/api/auditorias', requiereAdmin, manejar(async (req, res) => {
         );
         for (const d of a.detalles) {
             await conn.query(
-                'INSERT INTO detalle_auditoria (auditoria_id, producto_id, producto_nombre, cantidad_anterior, cantidad_auditada, diferencia) VALUES (?, ?, ?, ?, ?, ?)',
-                [a.id, d.productoId || null, d.productoNombre, Number(d.cantidadAnterior) || 0, Number(d.cantidadAuditada) || 0, Number(d.diferencia) || 0]
+                'INSERT INTO detalle_auditoria (auditoria_id, producto_id, producto_nombre, cantidad_auditada) VALUES (?, ?, ?, ?)',
+                [a.id, d.productoId || null, d.productoNombre, Number(d.cantidadAuditada) || 0]
             );
             // La auditoría actualiza el inventario actual (el registro histórico queda inmutable).
             await conn.query(
