@@ -1,0 +1,45 @@
+# =========================================================
+# Render Blueprint — despliegue del backend de Auditoria
+# ---------------------------------------------------------
+# Al conectar el repositorio en Render (New > Blueprint),
+# esto crea el servicio automáticamente.
+#
+# IMPORTANTE: después de crear el servicio, agrega en el
+# dashboard (Environment) las variables SECRETAS que NO van
+# en este archivo:
+#   DB_PASSWORD        (contraseña de avnadmin en Aiven)
+#   JWT_SECRET         (secreto para firmar tokens)
+#   ADMIN_CONTRASENA   (contraseña del administrador)
+#   LECTURA_CONTRASENA (contraseña del usuario de consulta)
+# =========================================================
+services:
+  - type: web
+    name: auditoria-app
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: DB_HOST
+        value: mysql-punta-negra-project-desk.c.aivencloud.com
+      - key: DB_PORT
+        value: "26056"
+      - key: DB_USER
+        value: avnadmin
+      - key: DB_NAME
+        value: defaultdb
+      - key: DB_SSL
+        value: "true"
+      - key: ADMIN_USUARIO
+        value: FP70270486
+      - key: ADMIN_NOMBRE
+        value: Administrador
+      - key: LECTURA_USUARIO
+        value: lectura
+      - key: LECTURA_NOMBRE
+        value: Usuario de consulta

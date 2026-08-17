@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditoria — Gestión y Auditoría de Inventarios</title>
+    <meta name="description" content="Sistema empresarial de gestión y auditoría de inventarios por áreas.">
+    <link rel="icon" type="image/svg+xml" href="assets/img/logo.svg">
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Estilos propios -->
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- ============ PANTALLA DE LOGIN ============ -->
+<div class="login-view" id="vistaLogin">
+    <div class="login-card card shadow-lg">
+        <div class="text-center mb-4">
+            <img src="assets/img/logo.svg" alt="Logo Auditoria" class="login-logo mb-3">
+            <h1 class="login-titulo mb-1">Auditoria</h1>
+            <p class="text-muted mb-0">Gestión y auditoría de inventarios</p>
+        </div>
+        <form id="formLogin" novalidate>
+            <div class="mb-3">
+                <label class="form-label small fw-semibold" for="campoLoginUsuario">Usuario</label>
+                <input type="text" class="form-control" id="campoLoginUsuario" placeholder="Tu usuario" autocomplete="username" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label small fw-semibold" for="campoLoginContrasena">Contraseña</label>
+                <input type="password" class="form-control" id="campoLoginContrasena" placeholder="Tu contraseña" autocomplete="current-password" required>
+            </div>
+            <div class="alert alert-danger py-2 small d-none" id="alertaLogin" role="alert"></div>
+            <button type="submit" class="btn btn-primary w-100" id="btnLogin">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Ingresar
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Overlay de carga inicial -->
+<div class="overlay-carga" id="overlayCarga">
+    <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
+    <p class="mt-3 mb-0 text-muted">Cargando datos...</p>
+</div>
+
+<div class="app-shell">
+
+    <!-- ============ SIDEBAR (escritorio) ============ -->
+    <aside class="sidebar d-none d-lg-flex flex-column" id="sidebar">
+        <div class="sidebar-brand d-flex align-items-center gap-2">
+            <img src="assets/img/logo.svg" alt="Logo" class="brand-logo">
+            <div class="brand-text">
+                <strong>Auditoria</strong>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav flex-grow-1">
+            <p class="nav-label">Menú principal</p>
+            <a href="#" class="nav-link-app active" data-seccion="dashboard"><i class="bi bi-speedometer2"></i><span>Dashboard</span></a>
+            <a href="#" class="nav-link-app" data-seccion="areas"><i class="bi bi-buildings"></i><span>Áreas</span></a>
+            <a href="#" class="nav-link-app" data-seccion="productos"><i class="bi bi-box-seam"></i><span>Productos</span></a>
+            <a href="#" class="nav-link-app solo-admin" data-seccion="auditoria"><i class="bi bi-clipboard2-check"></i><span>Nueva Auditoría</span></a>
+            <a href="#" class="nav-link-app" data-seccion="historial"><i class="bi bi-clock-history"></i><span>Historial</span></a>
+            <a href="#" class="nav-link-app" data-seccion="reportes"><i class="bi bi-file-earmark-bar-graph"></i><span>Reportes</span></a>
+            <a href="#" class="nav-link-app" data-seccion="perfil"><i class="bi bi-person-circle"></i><span>Mi Perfil</span></a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="d-flex align-items-center gap-2" id="bloqueUsuarioSidebar" role="button" title="Mi perfil" style="cursor:pointer">
+                <div class="avatar bg-primary-subtle text-primary" id="avatarSidebar"><i class="bi bi-person"></i></div>
+                <div class="flex-grow-1">
+                    <small class="d-block fw-semibold" id="txtUsuarioNombre">—</small>
+                </div>
+                <button class="btn-icon" type="button" id="btnCerrarSesion" title="Cerrar sesión"><i class="bi bi-box-arrow-right"></i></button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ============ OFF-CANVAS (móvil / tablet) ============ -->
+    <div class="offcanvas offcanvas-start sidebar-movil" tabindex="-1" id="offcanvasMenu">
+        <div class="offcanvas-header">
+            <div class="sidebar-brand d-flex align-items-center gap-2">
+                <img src="assets/img/logo.svg" alt="Logo" class="brand-logo">
+                <div class="brand-text">
+                    <strong>Auditoria</strong>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+        </div>
+        <div class="offcanvas-body d-flex flex-column">
+            <nav class="sidebar-nav flex-grow-1">
+                <p class="nav-label">Menú principal</p>
+                <a href="#" class="nav-link-app active" data-seccion="dashboard"><i class="bi bi-speedometer2"></i><span>Dashboard</span></a>
+                <a href="#" class="nav-link-app" data-seccion="areas"><i class="bi bi-buildings"></i><span>Áreas</span></a>
+                <a href="#" class="nav-link-app" data-seccion="productos"><i class="bi bi-box-seam"></i><span>Productos</span></a>
+                <a href="#" class="nav-link-app solo-admin" data-seccion="auditoria"><i class="bi bi-clipboard2-check"></i><span>Nueva Auditoría</span></a>
+                <a href="#" class="nav-link-app" data-seccion="historial"><i class="bi bi-clock-history"></i><span>Historial</span></a>
+                <a href="#" class="nav-link-app" data-seccion="reportes"><i class="bi bi-file-earmark-bar-graph"></i><span>Reportes</span></a>
+                <a href="#" class="nav-link-app" data-seccion="perfil"><i class="bi bi-person-circle"></i><span>Mi Perfil</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="d-flex align-items-center gap-2" id="bloqueUsuarioSidebarMovil" role="button" title="Mi perfil" style="cursor:pointer">
+                    <div class="avatar bg-primary-subtle text-primary" id="avatarSidebarMovil"><i class="bi bi-person"></i></div>
+                    <div class="flex-grow-1">
+                        <small class="d-block fw-semibold" id="txtUsuarioNombreMovil">—</small>
+                        <small class="text-muted" id="txtUsuarioRolMovil">—</small>
+                    </div>
+                    <button class="btn-icon" type="button" id="btnCerrarSesionMovil" title="Cerrar sesión" style="color:#fff"><i class="bi bi-box-arrow-right"></i></button>
+                </div>
+                <small class="text-muted d-block mt-2">v2.0 · MySQL + Express</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ CONTENIDO PRINCIPAL ============ -->
+    <div class="main-wrapper">
+
+        <!-- Barra superior -->
+        <header class="topbar d-flex align-items-center gap-3">
+            <button class="btn btn-icon d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu" aria-label="Abrir menú">
+                <i class="bi bi-list fs-4"></i>
+            </button>
+            <h1 class="page-title mb-0" id="pageTitle">Dashboard</h1>
+            <div class="ms-auto d-flex align-items-center gap-2">
+                <span class="badge text-bg-light border d-none d-md-inline-flex align-items-center gap-1" id="badgeDatos">
+                    <i class="bi bi-hourglass-split"></i> Conectando...
+                </span>
+                <div class="avatar bg-primary-subtle text-primary" id="avatarTopbar" role="button" title="Mi perfil" style="cursor:pointer"><i class="bi bi-person-fill"></i></div>
+            </div>
+        </header>
+
+        <main class="content">
+
+            <!-- ============ PANTALLA INICIAL (primera vez) ============ -->
+            <section class="seccion" id="vistaVacia">
+                <div class="card card-welcome shadow-sm">
+                    <div class="card-body text-center p-4 p-md-5">
+                        <img src="assets/img/logo.svg" alt="Logo Auditoria" class="welcome-logo mx-auto mb-3">
+                        <h2 class="fw-bold">Bienvenido a Auditoria</h2>
+                        <p class="text-muted mx-auto mb-4" style="max-width: 560px;">
+                            Sistema de gestión y auditoría de inventarios por áreas. Para comenzar,
+                            crea tus áreas y productos desde el menú y realiza auditorías.
+                        </p>
+                        <button class="btn btn-primary btn-lg px-4" id="btnIrAreas"><i class="bi bi-buildings me-2"></i>Ir a Áreas</button>
+                        <p class="text-muted small mt-4 mb-0"><i class="bi bi-info-circle me-1"></i>Los datos se guardan en la base de datos MySQL en la nube.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ DASHBOARD ============ -->
+            <section class="seccion active" id="vistaDashboard">
+                <!-- Filtros -->
+                <div class="card card-filtros shadow-sm mb-4">
+                    <div class="card-body py-3">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-sm-6 col-lg-3">
+                                <label class="form-label small fw-semibold" for="filtroPeriodo">Periodo</label>
+                                <select class="form-select form-select-sm" id="filtroPeriodo">
+                                    <option value="hoy">Hoy</option>
+                                    <option value="ayer">Ayer</option>
+                                    <option value="semana">Esta semana</option>
+                                    <option value="mes" selected>Este mes</option>
+                                    <option value="mesAnterior">Mes anterior</option>
+                                    <option value="personalizado">Rango personalizado</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-6 col-lg-3">
+                                <label class="form-label small fw-semibold" for="filtroArea">Área</label>
+                                <select class="form-select form-select-sm" id="filtroArea"></select>
+                            </div>
+                            <div class="col-6 col-lg-3 d-none" id="filtroDesdeWrap">
+                                <label class="form-label small fw-semibold" for="filtroDesde">Desde</label>
+                                <input type="date" class="form-control form-control-sm" id="filtroDesde">
+                            </div>
+                            <div class="col-6 col-lg-3 d-none" id="filtroHastaWrap">
+                                <label class="form-label small fw-semibold" for="filtroHasta">Hasta</label>
+                                <input type="date" class="form-control form-control-sm" id="filtroHasta">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjetas estadísticas principales -->
+                <div class="row g-3 mb-3" id="filaTarjetasPrincipales">
+                    <div class="col-6 col-xl-2">
+                        <div class="card-stat shadow-sm" data-bs-toggle="tooltip" title="Total de áreas registradas">
+                            <div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-buildings"></i></div>
+                            <div class="stat-info"><span class="stat-value" id="statAreas">0</span><span class="stat-label">Áreas</span></div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-xl-2">
+                        <div class="card-stat shadow-sm" data-bs-toggle="tooltip" title="Total de productos registrados">
+                            <div class="stat-icon bg-success-subtle text-success"><i class="bi bi-box-seam"></i></div>
+                            <div class="stat-info"><span class="stat-value" id="statProductos">0</span><span class="stat-label">Productos</span></div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-xl-2">
+                        <div class="card-stat shadow-sm" data-bs-toggle="tooltip" title="Unidades existentes en inventario">
+                            <div class="stat-icon bg-info-subtle text-info"><i class="bi bi-boxes"></i></div>
+                            <div class="stat-info"><span class="stat-value" id="statUnidades">0</span><span class="stat-label">Total unidades</span></div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-xl-2">
+                        <div class="card-stat shadow-sm" data-bs-toggle="tooltip" title="Auditorías realizadas en el periodo">
+                            <div class="stat-icon bg-warning-subtle text-warning"><i class="bi bi-clipboard2-check"></i></div>
+                            <div class="stat-info"><span class="stat-value" id="statAuditorias">0</span><span class="stat-label" id="lblAuditorias">Auditorías hoy</span></div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-xl-2">
+                        <div class="card-stat shadow-sm" data-bs-toggle="tooltip" title="Última auditoría registrada">
+                            <div class="stat-icon bg-danger-subtle text-danger"><i class="bi bi-clock-history"></i></div>
+                            <div class="stat-info"><span class="stat-value stat-value-sm" id="statUltimaAuditoria">—</span><span class="stat-label">Última auditoría</span></div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-xl-2">
+                        <div class="card-stat shadow-sm" data-bs-toggle="tooltip" title="Áreas auditadas en el periodo">
+                            <div class="stat-icon bg-secondary-subtle text-secondary"><i class="bi bi-diagram-3"></i></div>
+                            <div class="stat-info"><span class="stat-value" id="statAreasAuditadas">0</span><span class="stat-label">Áreas auditadas</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjetas del periodo -->
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-lg-3">
+                        <div class="card card-periodo h-100 shadow-sm">
+                            <div class="card-body d-flex align-items-center gap-3">
+                                <i class="bi bi-clipboard-check fs-3 text-primary"></i>
+                                <div><div class="fw-bold fs-5" id="statP_auditorias">0</div><small class="text-muted">Auditorías (periodo)</small></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="card card-periodo h-100 shadow-sm">
+                            <div class="card-body d-flex align-items-center gap-3">
+                                <i class="bi bi-diagram-3 fs-3 text-success"></i>
+                                <div><div class="fw-bold fs-5" id="statP_areas">0</div><small class="text-muted">Áreas auditadas (periodo)</small></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="card card-periodo h-100 shadow-sm">
+                            <div class="card-body d-flex align-items-center gap-3">
+                                <i class="bi bi-box-seam fs-3 text-warning"></i>
+                                <div><div class="fw-bold fs-5" id="statP_productos">0</div><small class="text-muted">Productos auditados (periodo)</small></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="card card-periodo h-100 shadow-sm">
+                            <div class="card-body d-flex align-items-center gap-3">
+                                <i class="bi bi-boxes fs-3 text-info"></i>
+                                <div><div class="fw-bold fs-5" id="statP_unidades">0</div><small class="text-muted">Unidades registradas (periodo)</small></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráficos -->
+                <div class="row g-3">
+                    <div class="col-lg-6">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-header d-flex align-items-center gap-2">
+                                <i class="bi bi-bar-chart-fill text-primary"></i><span class="fw-semibold">Inventario por área</span>
+                            </div>
+                            <div class="card-body chart-box">
+                                <div class="chart-empty d-none" id="vacioG1"><i class="bi bi-inbox"></i><p>Sin datos para mostrar</p></div>
+                                <canvas id="graficoInventarioArea" height="260"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-header d-flex align-items-center gap-2">
+                                <i class="bi bi-calendar-check text-success"></i><span class="fw-semibold">Auditorías por día</span>
+                            </div>
+                            <div class="card-body chart-box">
+                                <div class="chart-empty d-none" id="vacioG2"><i class="bi bi-inbox"></i><p>Sin datos para mostrar</p></div>
+                                <canvas id="graficoAuditoriasDia" height="260"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-header d-flex align-items-center gap-2">
+                                <i class="bi bi-pie-chart-fill text-info"></i><span class="fw-semibold">Productos por área</span>
+                            </div>
+                            <div class="card-body chart-box">
+                                <div class="chart-empty d-none" id="vacioG3"><i class="bi bi-inbox"></i><p>Sin datos para mostrar</p></div>
+                                <canvas id="graficoProductosArea" height="260"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-header d-flex align-items-center gap-2 justify-content-between">
+                                <span class="d-flex align-items-center gap-2"><i class="bi bi-graph-up-arrow text-warning"></i><span class="fw-semibold">Evolución del inventario</span></span>
+                                <select class="form-select form-select-sm w-auto" id="selectAreaEvolucion">
+                                    <option value="">Seleccionar área</option>
+                                </select>
+                            </div>
+                            <div class="card-body chart-box">
+                                <div class="chart-empty d-none" id="vacioG4"><i class="bi bi-inbox"></i><p>Selecciona un área para ver su evolución</p></div>
+                                <canvas id="graficoEvolucion" height="260"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ ÁREAS ============ -->
+            <section class="seccion" id="vistaAreas">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="search" class="form-control" id="buscarArea" placeholder="Buscar área...">
+                    </div>
+                    <button class="btn btn-primary solo-admin" id="btnNuevaArea"><i class="bi bi-plus-lg me-1"></i>Nueva Área</button>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Área</th>
+                                    <th class="d-none d-md-table-cell">Descripción</th>
+                                    <th class="text-center">Productos</th>
+                                    <th>Estado</th>
+                                    <th class="d-none d-lg-table-cell">Última auditoría</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaAreas"></tbody>
+                        </table>
+                    </div>
+                    <div class="estado-vacio d-none" id="estadoVacioAreas">
+                        <i class="bi bi-buildings"></i>
+                        <p>No hay áreas registradas.<br><small class="text-muted">Crea tu primera área con el botón «Nueva Área».</small></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ INVENTARIO DE UN ÁREA ============ -->
+            <section class="seccion" id="vistaInventarioArea">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                    <button class="btn btn-outline-secondary" id="btnVolverAreas"><i class="bi bi-arrow-left me-1"></i>Volver a Áreas</button>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-primary" id="btnExportarInventarioArea"><i class="bi bi-filetype-csv me-1"></i>Exportar CSV</button>
+                        <button class="btn btn-outline-secondary" id="btnImprimirInventarioArea"><i class="bi bi-printer me-1"></i>Imprimir</button>
+                        <button class="btn btn-primary solo-admin" id="btnAuditarArea"><i class="bi bi-clipboard2-check me-1"></i>Realizar nueva auditoría</button>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-3">
+                    <div class="card-body d-flex flex-wrap align-items-center gap-3">
+                        <div class="avatar-lg bg-primary-subtle text-primary"><i class="bi bi-buildings"></i></div>
+                        <div class="flex-grow-1">
+                            <h4 class="mb-0 fw-bold" id="tituloInventarioArea">INVENTARIO — ÁREA</h4>
+                            <small class="text-muted" id="subtituloInventarioArea"></small>
+                        </div>
+                        <div class="text-end" id="infoUltimaAuditoriaArea">
+                            <small class="text-muted d-block">Última auditoría</small>
+                            <span class="fw-semibold" id="txtUltimaAuditoriaArea">—</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Código</th>
+                                    <th class="d-none d-md-table-cell">Unidad</th>
+                                    <th class="text-center">Cantidad</th>
+                                    <th class="d-none d-lg-table-cell">Última auditoría</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaInventarioArea"></tbody>
+                        </table>
+                    </div>
+                    <div class="estado-vacio d-none" id="estadoVacioInventarioArea">
+                        <i class="bi bi-box-seam"></i>
+                        <p>Esta área no tiene productos.<br><small class="text-muted">Agrega productos desde el módulo Productos.</small></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ PRODUCTOS ============ -->
+            <section class="seccion" id="vistaProductos">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                    <div class="d-flex flex-wrap gap-2 flex-grow-1">
+                        <div class="search-box">
+                            <i class="bi bi-search"></i>
+                            <input type="search" class="form-control" id="buscarProducto" placeholder="Buscar producto...">
+                        </div>
+                        <select class="form-select w-auto" id="filtroAreaProductos">
+                            <option value="">Todas las áreas</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary solo-admin" id="btnNuevoProducto"><i class="bi bi-plus-lg me-1"></i>Nuevo Producto</button>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Código</th>
+                                    <th>Área</th>
+                                    <th class="d-none d-md-table-cell">Unidad</th>
+                                    <th class="text-center">Cantidad</th>
+                                    <th class="d-none d-lg-table-cell">Actualizado</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaProductos"></tbody>
+                        </table>
+                    </div>
+                    <div class="estado-vacio d-none" id="estadoVacioProductos">
+                        <i class="bi bi-box-seam"></i>
+                        <p>No hay productos registrados.<br><small class="text-muted">Crea tu primer producto con el botón «Nuevo Producto».</small></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ NUEVA AUDITORÍA ============ -->
+            <section class="seccion" id="vistaAuditoria">
+                <div class="card shadow-sm mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3"><i class="bi bi-clipboard2-check me-2 text-primary"></i>Datos de la auditoría</h5>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label small fw-semibold" for="campoAudArea">Área *</label>
+                                <select class="form-select" id="campoAudArea">
+                                    <option value="">Seleccionar área...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-semibold" for="campoAudFecha">Fecha *</label>
+                                <input type="date" class="form-control" id="campoAudFecha">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-semibold" for="campoAudHora">Hora *</label>
+                                <input type="time" class="form-control" id="campoAudHora">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-semibold" for="campoAudResponsable">Responsable <span class="text-muted fw-normal">(opcional)</span></label>
+                                <input type="text" class="form-control" id="campoAudResponsable" placeholder="Nombre del responsable">
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label small fw-semibold" for="campoAudObservacion">Observación <span class="text-muted fw-normal">(opcional)</span></label>
+                                <textarea class="form-control" id="campoAudObservacion" rows="1" placeholder="Comentarios generales de la auditoría"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <span class="fw-semibold" id="tituloAuditoriaProductos"><i class="bi bi-box-seam me-2 text-success"></i>Productos del área</span>
+                        <span class="badge text-bg-light border" id="badgeConteoAuditoria">0 productos</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th class="text-center d-none d-sm-table-cell">Unidad</th>
+                                    <th class="text-center">Cantidad actual</th>
+                                    <th class="text-center" style="min-width: 170px;">Cantidad encontrada</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaAuditoriaProductos"></tbody>
+                        </table>
+                    </div>
+                    <div class="estado-vacio d-none" id="estadoVacioAuditoriaProductos">
+                        <i class="bi bi-inbox"></i>
+                        <p>Selecciona un área para cargar sus productos.</p>
+                    </div>
+                    <div class="card-footer d-flex flex-wrap justify-content-end gap-2">
+                        <button class="btn btn-outline-secondary" id="btnCancelarAuditoria"><i class="bi bi-x-lg me-1"></i>Cancelar</button>
+                        <button class="btn btn-primary solo-admin" id="btnGuardarAuditoria"><i class="bi bi-check-lg me-1"></i>Guardar auditoría</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ HISTORIAL ============ -->
+            <section class="seccion" id="vistaHistorial">
+                <div class="card card-filtros shadow-sm mb-3">
+                    <div class="card-body py-3">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-4 col-lg-3">
+                                <label class="form-label small fw-semibold" for="buscarHistorial">Buscar</label>
+                                <div class="search-box">
+                                    <i class="bi bi-search"></i>
+                                    <input type="search" class="form-control form-control-sm" id="buscarHistorial" placeholder="Área, responsable, observación...">
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-4 col-lg-2">
+                                <label class="form-label small fw-semibold" for="filtroHistorialArea">Área</label>
+                                <select class="form-select form-select-sm" id="filtroHistorialArea"><option value="">Todas</option></select>
+                            </div>
+                            <div class="col-6 col-md-4 col-lg-2">
+                                <label class="form-label small fw-semibold" for="filtroHistorialFecha">Fecha</label>
+                                <input type="date" class="form-control form-control-sm" id="filtroHistorialFecha">
+                            </div>
+                            <div class="col-6 col-md-6 col-lg-2">
+                                <label class="form-label small fw-semibold" for="filtroHistorialMes">Mes</label>
+                                <input type="month" class="form-control form-control-sm" id="filtroHistorialMes">
+                            </div>
+                            <div class="col-6 col-md-6 col-lg-3 d-flex gap-2 justify-content-md-end">
+                                <button class="btn btn-sm btn-outline-primary" id="btnExportarHistorial"><i class="bi bi-filetype-csv me-1"></i>CSV</button>
+                                <button class="btn btn-sm btn-outline-secondary" id="btnImprimirHistorial"><i class="bi bi-printer me-1"></i>Imprimir</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Fecha</th>
+                                    <th>Hora</th>
+                                    <th>Área</th>
+                                    <th class="d-none d-md-table-cell">Responsable</th>
+                                    <th class="text-center d-none d-lg-table-cell">Productos</th>
+                                    <th class="text-center">Unidades</th>
+                                    <th class="d-none d-xl-table-cell">Observación</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaHistorial"></tbody>
+                        </table>
+                    </div>
+                    <div class="estado-vacio d-none" id="estadoVacioHistorial">
+                        <i class="bi bi-clock-history"></i>
+                        <p>No hay auditorías registradas.<br><small class="text-muted">Realiza tu primera auditoría desde el módulo «Nueva Auditoría».</small></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ REPORTES ============ -->
+            <section class="seccion" id="vistaReportes">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-file-earmark-bar-graph me-2 text-primary"></i>Inventario actual</h5>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-primary" id="btnExportarInventario"><i class="bi bi-filetype-csv me-1"></i>Exportar CSV</button>
+                        <button class="btn btn-outline-secondary" id="btnImprimirInventario"><i class="bi bi-printer me-1"></i>Imprimir reporte</button>
+                    </div>
+                </div>
+
+                <div class="card card-filtros shadow-sm mb-3">
+                    <div class="card-body py-3">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold" for="buscarInventario">Buscar</label>
+                                <div class="search-box">
+                                    <i class="bi bi-search"></i>
+                                    <input type="search" class="form-control form-control-sm" id="buscarInventario" placeholder="Producto, categoría o área...">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold" for="filtroReporteArea">Área</label>
+                                <select class="form-select form-select-sm" id="filtroReporteArea"><option value="">Todas las áreas</option></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead id="encabezadoTablaInventario">
+                                <tr>
+                                    <th>Área</th>
+                                    <th>Producto</th>
+                                    <th class="d-none d-md-table-cell">Código</th>
+                                    <th class="d-none d-md-table-cell">Unidad</th>
+                                    <th class="text-center">Cantidad</th>
+                                    <th class="d-none d-lg-table-cell">Actualizado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaInventario"></tbody>
+                        </table>
+                    </div>
+                    <div class="estado-vacio d-none" id="estadoVacioInventario">
+                        <i class="bi bi-boxes"></i>
+                        <p>No hay inventario registrado.<br><small class="text-muted">Agrega áreas y productos para ver el reporte.</small></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ MI PERFIL ============ -->
+            <section class="seccion" id="vistaPerfil">
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-4"><i class="bi bi-person-circle me-2 text-primary"></i>Mi perfil</h5>
+                        <div class="d-flex flex-wrap align-items-start gap-4">
+                            <div class="text-center">
+                                <img src="assets/img/logo.svg" alt="Foto de perfil" id="imgFotoPerfil" class="foto-perfil mb-2">
+                                <div>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="btnCambiarFoto"><i class="bi bi-camera me-1"></i>Cambiar foto</button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" id="btnQuitarFoto" title="Quitar foto"><i class="bi bi-x-lg"></i></button>
+                                </div>
+                                <input type="file" id="campoFotoPerfil" accept="image/*" class="d-none">
+                                <small class="text-muted d-block mt-2">JPG o PNG · máx. 1 MB</small>
+                            </div>
+                            <form id="formPerfil" class="flex-grow-1" style="max-width: 520px;" novalidate>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-semibold" for="campoPerfilNombre">Nombre</label>
+                                        <input type="text" class="form-control" id="campoPerfilNombre" maxlength="100" placeholder="Tu nombre">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-semibold" for="campoPerfilEmail">Correo electrónico</label>
+                                        <input type="email" class="form-control" id="campoPerfilEmail" maxlength="100" placeholder="correo@ejemplo.com">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-semibold" for="campoPerfilTelefono">Teléfono</label>
+                                        <input type="tel" class="form-control" id="campoPerfilTelefono" maxlength="30" placeholder="Teléfono / celular">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-semibold" for="campoPerfilUsuario">Nombre de usuario *</label>
+                                        <input type="text" class="form-control" id="campoPerfilUsuario" maxlength="50" required placeholder="Tu usuario para iniciar sesión">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-semibold" for="campoPerfilNuevaContrasena">Nueva contraseña</label>
+                                        <input type="password" class="form-control" id="campoPerfilNuevaContrasena" maxlength="100" autocomplete="new-password" placeholder="Déjala vacía para no cambiarla">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-semibold" for="campoPerfilConfirmarContrasena">Confirmar contraseña</label>
+                                        <input type="password" class="form-control" id="campoPerfilConfirmarContrasena" maxlength="100" autocomplete="new-password" placeholder="Repite la nueva contraseña">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small fw-semibold" for="campoPerfilRol">Rol</label>
+                                        <input type="text" class="form-control" id="campoPerfilRol" disabled>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="alert alert-info py-2 small d-none mb-0" id="avisoClaveAdmin">
+                                            <i class="bi bi-shield-lock me-1"></i>Como usuario de consulta, cada vez que guardes cambios se te pedirá la contraseña del administrador.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <button type="submit" class="btn btn-primary" id="btnGuardarPerfil"><i class="bi bi-check-lg me-1"></i>Guardar cambios</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+            <!-- ============ MODAL: ÁREA ============ -->
+<div class="modal fade" id="modalArea" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tituloModalArea"><i class="bi bi-buildings me-2 text-primary"></i>Nueva Área</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <form id="formArea" novalidate>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold" for="campoAreaNombre">Nombre del área *</label>
+                        <input type="text" class="form-control" id="campoAreaNombre" placeholder="Ej.: Almacén" required maxlength="80">
+                        <div class="invalid-feedback">Ingresa el nombre del área.</div>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-semibold" for="campoAreaDescripcion">Descripción</label>
+                        <textarea class="form-control" id="campoAreaDescripcion" rows="3" placeholder="Descripción breve del área (opcional)"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btnGuardarArea"><i class="bi bi-check-lg me-1"></i>Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ============ MODAL: PRODUCTO ============ -->
+<div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tituloModalProducto"><i class="bi bi-box-seam me-2 text-success"></i>Nuevo Producto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <form id="formProducto" novalidate>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold" for="campoProductoArea">Área *</label>
+                        <select class="form-select" id="campoProductoArea" required>
+                            <option value="">Seleccionar área...</option>
+                        </select>
+                        <div class="invalid-feedback">Selecciona el área del producto.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold" for="campoProductoNombre">Nombre del producto *</label>
+                        <input type="text" class="form-control" id="campoProductoNombre" placeholder="Ej.: Casco de seguridad" required maxlength="100">
+                        <div class="invalid-feedback">Ingresa el nombre del producto.</div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold" for="campoProductoCodigo">Código del producto *</label>
+                            <input type="text" class="form-control" id="campoProductoCodigo" placeholder="Ej.: 565677" required maxlength="50">
+                            <div class="invalid-feedback">Ingresa el código del producto (debe ser único).</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold" for="campoProductoUnidad">Unidad</label>
+                            <select class="form-select" id="campoProductoUnidad">
+                                <option value="unidades">Unidades</option>
+                                <option value="piezas">Piezas</option>
+                                <option value="cajas">Cajas</option>
+                                <option value="pares">Pares</option>
+                                <option value="litros">Litros</option>
+                                <option value="kg">Kilogramos</option>
+                                <option value="metros">Metros</option>
+                                <option value="sets">Sets</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="alert alert-info py-2 small mt-3 mb-0">
+                        <i class="bi bi-info-circle me-1"></i>La cantidad se registra al realizar la auditoría.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success" id="btnGuardarProducto"><i class="bi bi-check-lg me-1"></i>Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ============ MODAL: CONFIRMACIÓN ============ -->
+<div class="modal fade" id="modalConfirmar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="tituloConfirmar"><i class="bi bi-exclamation-triangle me-2 text-danger"></i>Confirmar acción</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" id="mensajeConfirmar">¿Estás seguro de realizar esta acción?</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarModal"><i class="bi bi-trash me-1"></i>Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============ MODAL: DETALLE AUDITORÍA ============ -->
+<div class="modal fade" id="modalDetalleAuditoria" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tituloDetalleAuditoria"><i class="bi bi-clipboard2-check me-2 text-primary"></i>Detalle de auditoría</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" id="cuerpoDetalleAuditoria"></div>
+            <div class="modal-footer">
+                <button class="btn btn-outline-secondary" id="btnImprimirDetalle"><i class="bi bi-printer me-1"></i>Imprimir</button>
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============ MODAL: COMPARAR AUDITORÍAS ============ -->
+<div class="modal fade" id="modalComparar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-arrow-left-right me-2 text-info"></i>Comparación de auditorías</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold" for="selectAudActual">Auditoría actual</label>
+                        <select class="form-select form-select-sm" id="selectAudActual"></select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold" for="selectAudAnterior">Auditoría anterior</label>
+                        <select class="form-select form-select-sm" id="selectAudAnterior"></select>
+                    </div>
+                </div>
+                <div id="cuerpoComparacion"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline-secondary" id="btnImprimirComparacion"><i class="bi bi-printer me-1"></i>Imprimir</button>
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============ MODAL: CONTRASEÑA DEL ADMINISTRADOR ============ -->
+<div class="modal fade" id="modalClaveAdmin" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title"><i class="bi bi-shield-lock me-2 text-primary"></i>Contraseña del administrador</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p class="small text-muted mb-2">Para modificar tu perfil necesitas la contraseña del administrador.</p>
+                <input type="password" class="form-control" id="campoClaveAdmin" placeholder="Contraseña del administrador" autocomplete="current-password">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnConfirmarClaveAdmin"><i class="bi bi-check-lg me-1"></i>Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Contenedor de toasts -->
+<div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer"></div>
+
+<!-- Bootstrap Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<!-- Módulos de la aplicación -->
+<script src="js/storage.js"></script>
+<script src="js/inventario.js"></script>
+<script src="js/auditorias.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/perfil.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

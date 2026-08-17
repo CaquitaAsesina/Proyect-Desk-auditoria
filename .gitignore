@@ -1,0 +1,14 @@
+# Dependencias
+node_modules/
+backend/node_modules/
+
+# Credenciales y configuración local (¡nunca subir!)
+backend/.env
+backend/.env.local
+backend/.env.aiven
+backend/.env.*.local
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+*.log

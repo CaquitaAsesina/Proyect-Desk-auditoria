@@ -1,0 +1,24 @@
+{
+  "name": "auditoria-backend",
+  "version": "2.0.0",
+  "description": "API REST y servidor estático para Auditoria (Express + MySQL + autenticación JWT)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "bd:local": "node switch-db.js local",
+    "bd:aiven": "node switch-db.js aiven",
+    "sync:cloud-a-local": "node sync-bd.js aiven local",
+    "sync:local-a-cloud": "node sync-bd.js local aiven"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.11.3"
+  }
+}
